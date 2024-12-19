@@ -1,12 +1,18 @@
 // Sistem Pemesanan Tiket Bioskop
 
-let movies = [
+// Inisialisasi data film
+let movies = JSON.parse(localStorage.getItem("movies")) || [
     { id: 1, name: "Film A", schedule: "14:00", price: 35000, seats: 30 },
     { id: 2, name: "Film B", schedule: "16:00", price: 40000, seats: 25 },
     { id: 3, name: "Film C", schedule: "18:00", price: 50000, seats: 20 },
 ];
 
-let orders = JSON.parse(localStorage.getItem("orders")) || []; // Ambil riwayat pemesanan dari localStorage
+let orders = JSON.parse(localStorage.getItem("orders")) || [];
+
+// Menyimpan data film ke localStorage jika belum ada
+if (!localStorage.getItem("movies")) {
+    localStorage.setItem("movies", JSON.stringify(movies));
+}
 
 function mainMenu() {
     let shouldContinue = true;
@@ -43,9 +49,15 @@ Pilih opsi:
 
 function displayMovies() {
     console.log("\n=== Daftar Film ===");
-    movies.forEach(movie => {
-        console.log(`${movie.id}. ${movie.name} - Jam: ${movie.schedule} - Harga: Rp${movie.price.toLocaleString("id-ID")} - Kursi Tersedia: ${movie.seats}`);
-    });
+    console.table(
+        movies.map(movie => ({
+            ID: movie.id,
+            Nama: movie.name,
+            Jam: movie.schedule,
+            Harga: `Rp${movie.price.toLocaleString("id-ID")}`,
+            Kursi: movie.seats,
+        }))
+    );
 }
 
 function placeOrder() {
@@ -68,7 +80,11 @@ function placeOrder() {
 
     const totalPrice = ticketCount * selectedMovie.price;
 
-    const confirmOrder = confirm(`Anda memesan ${ticketCount} tiket untuk film "${selectedMovie.name}" dengan total harga Rp${totalPrice.toLocaleString("id-ID")}. Konfirmasi pesanan?`);
+    const confirmOrder = confirm(
+        `Anda memesan ${ticketCount} tiket untuk film "${selectedMovie.name}" dengan total harga Rp${totalPrice.toLocaleString(
+            "id-ID"
+        )}. Konfirmasi pesanan?`
+    );
 
     if (confirmOrder) {
         selectedMovie.seats -= ticketCount;
@@ -78,8 +94,8 @@ function placeOrder() {
             ticketCount,
             totalPrice,
         });
-        saveOrdersToLocalStorage();
-        alert("✅ Tiket berhasil dipesan!");
+        saveDataToLocalStorage();
+        alert(`✅ Tiket berhasil dipesan! Sisa kursi: ${selectedMovie.seats}`);
     } else {
         alert("Pesanan dibatalkan.");
     }
@@ -93,11 +109,16 @@ function showOrderHistory() {
 
     console.log("\n=== Riwayat Pemesanan ===");
     orders.forEach((order, index) => {
-        console.log(`${index + 1}. Film: ${order.movie} - Jam: ${order.schedule} - Jumlah Tiket: ${order.ticketCount} - Total: Rp${order.totalPrice.toLocaleString("id-ID")}`);
+        console.log(
+            `${index + 1}. Film: ${order.movie} - Jam: ${order.schedule} - Jumlah Tiket: ${order.ticketCount} - Total: Rp${order.totalPrice.toLocaleString(
+                "id-ID"
+            )}`
+        );
     });
 }
 
-function saveOrdersToLocalStorage() {
+function saveDataToLocalStorage() {
+    localStorage.setItem("movies", JSON.stringify(movies));
     localStorage.setItem("orders", JSON.stringify(orders));
 }
 
