@@ -1,5 +1,3 @@
-// Sistem reservasi ruangan
-
 let rooms = [
     { id: 1, name: "Ruangan Rapat", capacity: 10 },
     { id: 2, name: "Ruangan Seminar", capacity: 50 },
@@ -9,9 +7,7 @@ let rooms = [
 let reservations = JSON.parse(localStorage.getItem("reservations")) || [];
 
 function mainMenu() {
-    let shouldContinue = true;
-
-    while (shouldContinue) {
+    while (true) {
         const choice = prompt(`
         === SISTEM RESERVASI RUANGAN ===
         Pilih opsi:
@@ -20,7 +16,7 @@ function mainMenu() {
         3. Lihat Jadwal Pemesanan
         4. Cek Ketersediaan Ruangan
         5. Keluar
-    `);
+        `);
 
         switch (choice) {
             case "1":
@@ -37,8 +33,7 @@ function mainMenu() {
                 break;
             case "5":
                 alert("Terima kasih telah menggunakan sistem kami!");
-                shouldContinue = false;
-                break;
+                return;
             default:
                 alert("Opsi tidak valid. Silakan coba lagi.");
         }
@@ -67,8 +62,8 @@ function addReservation() {
     const endTime = prompt("Masukkan waktu cek-out (format: YYYY-MM-DD HH:mm):");
     const bookerName = prompt("Masukkan nama pemesan:");
 
-    if (!startTime || !endTime || !bookerName) {
-        alert("Input tidak valid!");
+    if (!validateInput(startTime, endTime, bookerName)) {
+        alert("Input tidak valid! Periksa kembali data Anda.");
         return;
     }
 
@@ -104,8 +99,6 @@ function viewReservations() {
 }
 
 function checkAvailability() {
-    displayRooms();
-
     const roomId = parseInt(prompt("Masukkan ID ruangan yang ingin dicek:"));
     const selectedRoom = rooms.find(room => room.id === roomId);
 
@@ -117,8 +110,8 @@ function checkAvailability() {
     const startTime = prompt("Masukkan waktu mulai (format: YYYY-MM-DD HH:mm):");
     const endTime = prompt("Masukkan waktu selesai (format: YYYY-MM-DD HH:mm):");
 
-    if (!startTime || !endTime) {
-        alert("Input tidak valid!");
+    if (!validateInput(startTime, endTime)) {
+        alert("Input tidak valid! Periksa kembali format waktu.");
         return;
     }
 
@@ -137,6 +130,16 @@ function isRoomAvailable(roomId, startTime, endTime) {
             (endTime > reservation.startTime && endTime <= reservation.endTime))
         );
     });
+}
+
+function validateInput(startTime, endTime, bookerName = null) {
+    if (!startTime || !endTime) return false;
+    if (bookerName !== null && bookerName.trim() === "") return false;
+
+    const start = new Date(startTime);
+    const end = new Date(endTime);
+
+    return start instanceof Date && !isNaN(start) && end instanceof Date && !isNaN(end) && start < end;
 }
 
 function saveReservationsToLocalStorage() {
