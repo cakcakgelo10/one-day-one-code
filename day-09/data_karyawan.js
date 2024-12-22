@@ -1,9 +1,13 @@
-// Sistem Manajemen Data Karyawan
+// Manajemen data karyawan
 
 let employees = [
-    {id : 1, name : "Reza", age: 23, position: "Software Engginer", salary: 10000000},
-    {id : 2, name : "Fakhri", age: 24, position: "Manager", salary: 5000000},
+    { id: 1, name: "Reza", age: 23, position: "Software Engineer", salary: 10000000 },
+    { id: 2, name: "Fakhri", age: 24, position: "Manager", salary: 5000000 },
 ];
+
+function generateUniqueId() {
+    return employees.length ? Math.max(...employees.map(e => e.id)) + 1 : 1;
+}
 
 function mainMenu() {
     while (true) {
@@ -20,6 +24,7 @@ function mainMenu() {
         switch (choice) {
             case "1":
                 addEmployee();
+                break;
             case "2":
                 viewEmployee();
                 break;
@@ -30,57 +35,54 @@ function mainMenu() {
                 deleteEmployee();
                 break;
             case "5":
-                alert("Terimakasih telah menggunakan sistem kami !");
+                alert("Terima kasih telah menggunakan sistem kami!");
                 return;
             default:
-                alert("Opsi tidak valid. Silahkan coba lagi.");
+                alert("Opsi tidak valid. Silakan coba lagi.");
         }
     }
 }
 
 function addEmployee() {
-    const name = prompt("Masukan nama karyawan:").trim();
-    const age = parseInt(prompt("Masukan usia karyawan:"));
-    const position = prompt("Masukan posisi karyawan:").trim();
-    const salary = parseInt(prompt("Masukan gaji karyawan (dalam rupiah):"));
+    const name = prompt("Masukkan nama karyawan:").trim();
+    const age = parseInt(prompt("Masukkan usia karyawan:"));
+    const position = prompt("Masukkan posisi karyawan:").trim();
+    const salary = parseInt(prompt("Masukkan gaji karyawan (dalam rupiah):"));
 
-    if (!name || isNaN(age) || age <= 0 || !position || isNaN(salary) || salary <= 0) {
-        alert("Input tidak valid silahkan coba lagi");
+    if (!name || name.trim() === "" || isNaN(age) || age < 18 || !position || position.trim() === "" || isNaN(salary) || salary <= 0) {
+        alert("Input tidak valid! Silakan coba lagi.");
         return;
     }
 
-    const id = employees.length ? Math.max(...employees.map(e => e.id)) + 1 : 1;
-    employees.push({id, name, age, position, salary});
+    const id = generateUniqueId();
+    employees.push({ id, name, age, position, salary });
     alert("✅ Karyawan berhasil ditambahkan!");
-
 }
 
 function viewEmployee() {
     if (employees.length === 0) {
         console.log("📋 Tidak ada data karyawan.");
-        return;
+    } else {
+        console.table(employees);
     }
-
-    console.table(employees);
-
 }
 
 function editEmployee() {
-    const id = parseInt(prompt("Masukan id karyawan yang ingin diedit:"));
+    const id = parseInt(prompt("Masukkan ID karyawan yang ingin diedit:"));
     const employee = employees.find(e => e.id === id);
 
     if (!employee) {
-        alert("Karyawan tidak ditemukan !");
+        alert("Karyawan tidak ditemukan!");
         return;
     }
 
     const newName = prompt(`Nama baru (${employee.name}):`) || employee.name;
     const newAge = parseInt(prompt(`Usia baru (${employee.age}):`)) || employee.age;
-    const newPosition = prompt(`Posisi baru (${employee.position}):`) || employee.age;
+    const newPosition = prompt(`Posisi baru (${employee.position}):`) || employee.position;
     const newSalary = parseInt(prompt(`Gaji baru (${employee.salary}):`)) || employee.salary;
 
-    if (newAge <= 0 || newSalary <= 0) {
-        alert("Input tidak valid !. Perubahan dibatalkan.");
+    if (isNaN(newAge) || newAge < 18 || isNaN(newSalary) || newSalary <= 0) {
+        alert("Input tidak valid! Perubahan dibatalkan.");
         return;
     }
 
@@ -93,17 +95,23 @@ function editEmployee() {
 }
 
 function deleteEmployee() {
-    const id = parseInt(prompt("Masukan ID karyawan yang ingin dihapus"));
+    const id = parseInt(prompt("Masukkan ID karyawan yang ingin dihapus:"));
     const index = employees.findIndex(e => e.id === id);
 
     if (index === -1) {
-        alert("Karyawan tidak ditemukan !");
+        alert("Karyawan tidak ditemukan!");
+        return;
+    }
+
+    const confirmDelete = confirm(`Apakah Anda yakin ingin menghapus data karyawan dengan ID ${id}?`);
+    if (!confirmDelete) {
+        alert("Penghapusan dibatalkan.");
         return;
     }
 
     employees.splice(index, 1);
-    alert("✅ Data karyawan berhasil dihapus!")
+    alert("✅ Data karyawan berhasil dihapus!");
 }
 
-// menjalakan app
+// Menjalankan aplikasi
 mainMenu();
