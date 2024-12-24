@@ -7,6 +7,7 @@ let inventory = [
 ];
 
 let stockTransactions = [];
+let lastId = inventory.length ? Math.max(...inventory.map(item => item.id)) : 0;
 
 // Menu utama
 function mainMenu() {
@@ -53,17 +54,27 @@ function mainMenu() {
 
 // Tambah barang baru
 function addNewItem() {
-    const name = prompt("Masukkan nama barang:").trim();
-    const category = prompt("Masukkan kategori barang:").trim();
+    const name = prompt("Masukkan nama barang:")?.trim();
+    if (!name) {
+        alert("Nama barang tidak boleh kosong!");
+        return;
+    }
+
+    if (inventory.some(item => item.name.toLowerCase() === name.toLowerCase())) {
+        alert("Barang dengan nama ini sudah ada!");
+        return;
+    }
+
+    const category = prompt("Masukkan kategori barang:")?.trim();
     const stock = parseInt(prompt("Masukkan jumlah stok awal:"));
     const pricePerUnit = parseInt(prompt("Masukkan harga per unit:"));
 
-    if (!name || !category || isNaN(stock) || stock <= 0 || isNaN(pricePerUnit) || pricePerUnit <= 0) {
+    if (!category || isNaN(stock) || stock <= 0 || isNaN(pricePerUnit) || pricePerUnit <= 0) {
         alert("Input tidak valid! Silakan coba lagi.");
         return;
     }
 
-    const id = inventory.length ? Math.max(...inventory.map(item => item.id)) + 1 : 1;
+    const id = ++lastId;
     inventory.push({ id, name, category, stock, pricePerUnit });
     alert("✅ Barang berhasil ditambahkan!");
 }
@@ -128,7 +139,16 @@ function viewStockTransactions() {
     }
 
     console.log("\n=== Riwayat Transaksi Stok ===");
-    console.table(stockTransactions);
+    console.table(
+        stockTransactions.map(transaction => {
+            const item = inventory.find(i => i.id === transaction.itemId);
+            return {
+                ...transaction,
+                name: item?.name,
+                category: item?.category,
+            };
+        })
+    );
 }
 
 // Filter barang berdasarkan kategori
@@ -152,7 +172,19 @@ function generateRevenueReport() {
         .reduce((sum, t) => sum + t.revenue, 0);
 
     console.log("\n=== Laporan Pendapatan ===");
-    console.log(`Total Pendapatan: Rp${revenue.toLocaleString()}`);
+    console.table(
+        stockTransactions
+            .filter(t => t.type === "Kurangi" && t.revenue)
+            .map(t => {
+                const item = inventory.find(i => i.id === t.itemId);
+                return {
+                    name: item?.name,
+                    quantity: t.quantity,
+                    revenue: t.revenue,
+                };
+            })
+    );
+    console.log(`Total Pendapatan: Rp${new Intl.NumberFormat('id-ID').format(revenue)}`);
 }
 
 // Menjalankan aplikasi
