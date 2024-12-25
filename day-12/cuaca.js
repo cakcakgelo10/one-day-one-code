@@ -32,7 +32,7 @@ function mainMenu() {
                 predictNextDayWeather();
                 break;
             case "6":
-                alert("Terimakasih sudah menggunakan sistem ini.");
+                alert("Terima kasih sudah menggunakan sistem ini.");
                 return;                                       
             default:
                 alert("Pilihan tidak valid. Silakan coba lagi.");
@@ -42,13 +42,18 @@ function mainMenu() {
 
 // Tambah Data Cuaca Harian
 function addWeatherData() {
-    const date = prompt("Masukan tanggal (YYY - MM - DD):").trim();
-    const temperature = parseFloat(prompt("Masukan suhu (°C):"));
-    const humidity = parseFloat(prompt("Masukan tingkat kelembaban (%):"));
-    const rainfall = parseFloat(prompt("Masukan curah hujan (mm):"));
+    const date = prompt("Masukkan tanggal (YYYY-MM-DD):").trim();
+    const temperature = parseFloat(prompt("Masukkan suhu (°C):"));
+    const humidity = parseFloat(prompt("Masukkan tingkat kelembaban (%):"));
+    const rainfall = parseFloat(prompt("Masukkan curah hujan (mm):"));
 
-    if (!date || isNaN(temperature) || isNaN(humidity) || isNaN(rainfall)) {
-        alert("Input tidak valid! Silakan coba lagi.");
+    if (!date.match(/^\d{4}-\d{2}-\d{2}$/) || isNaN(temperature) || isNaN(humidity) || isNaN(rainfall)) {
+        alert("Input tidak valid! Format tanggal harus YYYY-MM-DD, dan nilai numerik harus valid.");
+        return;
+    }
+
+    if (weatherData.some(d => d.date === date)) {
+        alert("Data untuk tanggal ini sudah ada. Silakan perbarui atau masukkan tanggal lain.");
         return;
     }
 
@@ -58,20 +63,19 @@ function addWeatherData() {
 
 // Lihat Semua Data Cuaca
 function viewWeatherData() {
-    if (weatherData.length  === 0) {
+    if (weatherData.length === 0) {
         console.log("📋 Tidak ada data cuaca.");
         return;
     }
 
     console.log("\n=== Data Cuaca ===");
     console.table(weatherData);
-    
 }
 
 // Statistik data
 function displayWeatherStatistics() {
-    if (weatherData.length === 0 ) {
-        alert("📋 Tidak ada data untuk dihitung statistik.");
+    if (weatherData.length === 0) {
+        console.log("📋 Tidak ada data untuk dihitung statistik.");
         return;
     }
 
@@ -97,11 +101,16 @@ function displayWeatherStatistics() {
 
 // Pencarian Data Berdasarkan Tanggal
 function searchWeatherByDate() {
-    const date = prompt("Masukan tanggal (YYY - MM - DD):").trim();
+    const date = prompt("Masukkan tanggal (YYYY-MM-DD):").trim();
+    if (!date.match(/^\d{4}-\d{2}-\d{2}$/)) {
+        alert("Format tanggal tidak valid! Gunakan format YYYY-MM-DD.");
+        return;
+    }
+
     const result = weatherData.find(d => d.date === date);
 
     if (!result) {
-        alert(`📋 Tidak ada data untuk tanggal ${date}.`);
+        console.log(`📋 Tidak ada data untuk tanggal ${date}.`);
         return;
     }
 
