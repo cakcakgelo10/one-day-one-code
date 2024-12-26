@@ -1,19 +1,24 @@
 // Sistem Manajemen Pengguna dengan Autentikasi Dasar
 
 const crypto = require("crypto");
-const { register } = require("module");
+const readlineSync = require("readline-sync");
 
 let users = [];
 
-// function hashing kata sandi
+// Fungsi hashing kata sandi
 function hashPassword(password) {
     return crypto.createHash('sha256').update(password).digest('hex');
+}
+
+function isValidEmail(email) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
 }
 
 // Menu utama
 function mainMenu() {
     while (true) {
-        const choice = prompt(`
+        const choice = readlineSync.question(`
         === SISTEM MANAJEMEN PENGGUNA ===
             Pilih opsi:
             1. Registrasi
@@ -30,25 +35,30 @@ function mainMenu() {
                 login();
                 break;
             case "3":
-                viewUser();
+                viewUsers();
                 break;
             case "4":
-                console.log("Terimakasih sudah menggunakan sistem ini.");
+                console.log("Terima kasih sudah menggunakan sistem ini.");
                 return;
             default:
-            console.log("Opsi tidak valid. Silakan coba lagi.");
+                console.log("Opsi tidak valid. Silakan coba lagi.");
         }
     }
 }
 
 // Registrasi pengguna baru
 function register() {
-    const username = prompt("Masukan nama pengguna:").trim();
-    const email = prompt("Masukan email:").trim();
-    const password = prompt("Masukan kata sandi (min 8 karakter):");
+    const username = readlineSync.question("Masukkan nama pengguna: ").trim();
+    const email = readlineSync.question("Masukkan email: ").trim();
+    const password = readlineSync.question("Masukkan kata sandi (min 8 karakter): ", { hideEchoBack: true });
 
-    if (password.length < 8 ) {
-        console.log("kata sandi terlalu pendek !. Minimal 8 karakter.");
+    if (password.length < 8) {
+        console.log("Kata sandi terlalu pendek! Minimal 8 karakter.");
+        return;
+    }
+
+    if (!isValidEmail(email)) {
+        console.log("Email tidak valid! Silakan gunakan format email yang benar.");
         return;
     }
 
@@ -64,8 +74,8 @@ function register() {
 
 // Login pengguna
 function login() {
-    const email = prompt("Masukan email").trim();
-    const password = prompt("Masukan kata sandi:");
+    const email = readlineSync.question("Masukkan email: ").trim();
+    const password = readlineSync.question("Masukkan kata sandi: ", { hideEchoBack: true });
     const hashedPassword = hashPassword(password);
 
     const user = users.find(u => u.email === email && u.password === hashedPassword);
@@ -81,7 +91,7 @@ function login() {
 // Mengelola profil pengguna
 function manageProfile(user) {
     while (true) {
-        const choice = prompt(`
+        const choice = readlineSync.question(`
         === PENGELOLAAN PROFIL ===
             Pilih opsi:
             1. Lihat Profil
@@ -98,7 +108,7 @@ function manageProfile(user) {
                 `);
                 break;
             case "2":
-                const newUsername = prompt("Masukan nama pengguna baru:").trim();
+                const newUsername = readlineSync.question("Masukkan nama pengguna baru: ").trim();
                 user.username = newUsername || user.username;
                 console.log("✅ Profil berhasil diperbarui!");
                 break;
@@ -111,14 +121,14 @@ function manageProfile(user) {
 }
 
 // Melihat daftar pengguna (admin)
-function viewUser() {
+function viewUsers() {
     if (users.length === 0) {
         console.log("📋 Tidak ada pengguna terdaftar.");
         return;
     }
 
     console.log("\n=== Daftar Pengguna ===");
-    console.table(users.map(user => ({ username: user.username, email: user.email})));
+    console.table(users.map(user => ({ username: user.username, email: user.email })));
 }
 
 // Menjalankan aplikasi
