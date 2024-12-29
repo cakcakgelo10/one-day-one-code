@@ -67,7 +67,7 @@ app.put("/items/:id", (req, res) => {
     }
 
     inventory[itemIndex] = {
-        ...inventory[itemIndex],
+          ...inventory[itemIndex],
         nama: nama || inventory[itemIndex].nama,
         jumlah: jumlah !== undefined ? parseInt(jumlah) : inventory[itemIndex].jumlah,
         kategori: kategori || inventory[itemIndex].kategori,
