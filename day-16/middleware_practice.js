@@ -12,6 +12,33 @@ const logFile = "request.log";
 app.use(express.json());
 app.use(morgan("dev"));
 
+// Simulasi data pengguna
+const users = [
+    { username: "user1", password: "password1" },
+    { username: "user2", password: "password2" },
+];
+
+// Endpoint login untuk mendapatkan token
+app.post("/login", (req, res) => {
+    const { username, password } = req.body;
+
+    // Cari pengguna berdasarkan username dan password
+    const user = users.find(
+        (u) => u.username === username && u.password === password
+    );
+
+    if (!user) {
+        return res.status(401).json({ error: "Username atau password salah" });
+    }
+
+    // Buat token JWT
+    const token = jwt.sign({ username: user.username }, SECRET_KEY, {
+        expiresIn: "1h", // Token berlaku selama 1 jam
+    });
+
+    res.json({ token });
+});
+
 // Middleware A: Validasi header 'X-Requested-By'
 function validateHeader(req, res, next) {
     if (!req.headers["x-requested-by"]) {
