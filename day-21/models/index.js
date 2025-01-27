@@ -1,10 +1,9 @@
 const sequelize = require("../config/database");
 const Book = require("./book");
 const Author = require("./author");
-const { FOREIGNKEYS } = require("sequelize/lib/query-types");
 
-// Relasi 
-Author.hasMany(Book, {FOREIGNKEYS: "authorId", as: "books" });
-Book.belongsTo(Author, {FOREIGNKEYS: "authorId", as: "author"});
+// Relasi
+Author.hasMany(Book, { foreignKey: "authorId", as: "books" });
+Book.belongsTo(Author, { foreignKey: "authorId", as: "author" });
 
-module.exports = { sequelize, Book, Author};
+module.exports = { sequelize, Book, Author };
